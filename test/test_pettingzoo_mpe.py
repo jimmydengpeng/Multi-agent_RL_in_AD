@@ -2,11 +2,12 @@ from pettingzoo.mpe import simple_v2
 import numpy as np
 import time
 
-env = simple_v2.env(max_cycles=25, continuous_actions=False)
+env = simple_v2.env(max_cycles=25, continuous_actions=True)
 env.reset()
 
 agents = env.agents
 sp = env.action_space(agent=agents[0])
+print(sp)
 
 done = False
 while True:
