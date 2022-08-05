@@ -9,6 +9,9 @@ import matplotlib.pyplot as plt
 
 # env = simple_v2.env(max_cycles=25, continuous_actions=False)
 
+def env_creator():
+    return PettingZooEnv(simple_spread_v2.env(continuous_actions=True))
+
 env = simple_spread_v2.env(continuous_actions=True)
 
 env = PettingZooEnv(env)
