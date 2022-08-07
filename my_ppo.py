@@ -1,8 +1,10 @@
 import math
 import numpy as np
+import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import gym
+from tqdm import trange
 
 def get_space_dim(space):
     if isinstance(space, gym.spaces.Box):
@@ -19,7 +21,8 @@ def mlp(observation_space, action_space):
                 nn.Tanh(),
                 nn.Linear(64, 64),
                 nn.Tanh(),
-                nn.Linear(64, act_dim)
+                nn.Linear(64, act_dim),
+                nn.Softmax()
     )
 
     return net
@@ -41,36 +44,43 @@ def softmax_2(logits):
 
 def compute_action(pi, obs, env):
     obs_tensor = torch.as_tensor(obs, dtype=torch.float32)
-    action_logits = pi(obs_tensor)
-    # action_p = softmax(action_logits.numpy())
-    action_p = softmax_2(action_logits)
-    print(action_p)
-    print(action_p.sum())
-    
+    action_p = pi(obs_tensor)
     # print(action_p)
-    action = act(env.action_space, action_p.numpy())
-    # print(action)
+    
+    with torch.no_grad():
+        action = act(env.action_space, action_p.numpy())
     return action
 
+def plt_reward(rew):
+    x = np.linspace(1, len(rew), num=len(rew), endpoint=True)
+    plt.plot(x, rew)
+    plt.show()
 
 def main():
     env = gym.make("LunarLander-v2")
     # env = gym.make("CartPole-v1")
-    with torch.no_grad():
-        obs = env.reset()
-        pi = mlp(env.observation_space, env.action_space)
+    obs = env.reset()
+    pi = mlp(env.observation_space, env.action_space)
 
-        done = False
-        while True:
-            if done:
-                obs = env.reset()
-                done = False
-                print("===new===")
+    tot_rew = []
+    epi_rew = 0
+    done = False
+    
+    for _ in trange(10000):
+        if done:
+            obs = env.reset()
+            done = False
+            tot_rew.append(epi_rew)
+            epi_rew = 0
 
-            action = compute_action(pi, obs, env)
-            obs, r, done, i = env.step(action)
-            env.render()
-            print(r)
+        action = compute_action(pi, obs, env)
+        obs, r, done, i = env.step(action)
+        epi_rew += r
+        env.render()
+
+    print(tot_rew)
+    print(len(tot_rew))
+    plt_reward(tot_rew)
 
 
 
