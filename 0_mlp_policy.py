@@ -1,7 +1,11 @@
 """
-A simple policy net built with mlp
-WITHOUT defining loss_fn yet.
-NO gradient computing & parameter optimization.
+
+A simple policy net built with mlp WITHOUT defining loss_fn yet.
+There is NO gradient computing & parameter optimization.
+
+Copyright (C)
+Jimmy Deng, 2022.8.6
+
 """
 import math
 import numpy as np
@@ -62,7 +66,7 @@ def plt_reward(rew):
     plt.show()
 
 
-def main():
+if __name__ == "__main__":
     env = gym.make("LunarLander-v2")
     # env = gym.make("CartPole-v1")
     obs = env.reset()
@@ -87,8 +91,3 @@ def main():
     print(tot_rew)
     print(len(tot_rew))
     plt_reward(tot_rew)
-
-
-
-if __name__ == "__main__":
-    main()
